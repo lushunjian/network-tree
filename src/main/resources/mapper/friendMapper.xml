@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.lsj.dao.FriendDao">
+
+    <!--auto generated Code-->
+    <resultMap id="friend" type="cn.lsj.domain.Friend">
+        <result column="id" property="id"/>
+        <result column="friend_name" property="friendName"/>
+        <result column="friend_account" property="friendAccount"/>
+        <result column="friend_describe" property="friendDescribe"/>
+        <result column="user_account" property="userAccount"/>
+    </resultMap>
+
+    <select id="getFriendByAccount" parameterType="java.lang.String" resultMap="friend">
+       <!-- SELECT f.id,u.user_account as friend_account,u.user_describe as friend_describe,u.user_name as friend_name,f.user_account from friend f,user u WHERE u.user_account=f.friend_account and f.user_account=#{userAccount}-->
+        /*仅查出双向好友，排除单向好友*/
+        SELECT ue.id,ue.user_account as friend_account,ue.user_describe as friend_describe,ue.user_name as friend_name
+        FROM friend fd,user ue WHERE fd.user_account
+        in (SELECT u.user_account as friend_account from friend f,user u
+        WHERE u.user_account=f.friend_account and f.user_account=#{userAccount}) AND ue.user_account=fd.user_account
+        GROUP BY ue.id
+    </select>
+
+</mapper>
